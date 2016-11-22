@@ -10,6 +10,11 @@ using GSF.Packet.Json;
 
 namespace SampleServer
 {
+    public class EchoService : Service
+    {
+
+    }
+
     public class Program
     {
         public static void Main(string[] args)

@@ -14,11 +14,11 @@ namespace GSF
     using Packet;
     using Auth;
 
-    public partial class Service<T> : WebSocketBehavior, ICheckable
+    public partial class Service : WebSocketBehavior, ICheckable
     {
         private static Dictionary<Type, MethodInfo> Handlers { get; set; }
 
-        private static ConcurrentDictionary<int, T> Sessions { get; set; }
+        //private static ConcurrentDictionary<int, T> Sessions { get; set; }
 
         private int _UserId;
         public int UserId
@@ -26,7 +26,7 @@ namespace GSF
             get { return _UserId; }
             set
             {
-                Sessions[value] = (T)(object)this;
+                //Sessions[value] = (T)(object)this;
                 _UserId = value;
             }
         }
@@ -39,12 +39,12 @@ namespace GSF
             }
         }
 
-        static Service()
+        public Service()
         {
             Handlers = new Dictionary<Type, MethodInfo>();
-            Sessions = new ConcurrentDictionary<int, T>();
+            //Sessions = new ConcurrentDictionary<int, T>();
 
-            var handlerCandidates = typeof(T).GetMethods(
+            var handlerCandidates = GetType().GetMethods(
                 BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.GetParameters().Length == 1)
                 .Where(x => x.GetParameters().First().ParameterType == typeof(PacketBase))
@@ -68,11 +68,13 @@ namespace GSF
         /// <exception cref="KeyNotFoundException">
         /// 주어진 playerId로 찾을 수 없을 때
         /// </exception>
+        /*
         [ThreadSafe]
         protected static T GetSessionById(int playerId)
         {
             return Sessions[playerId];
         }
+        */
 
         protected void ErrorClose(CloseStatusCode code, string reason)
         {
@@ -163,7 +165,7 @@ namespace GSF
                 return;
             }
 
-            if (ProtocolCS.Constants.ProtocolVersion.version
+            if (ProtocolCS.Constants.ProtocolVersion.version // TODO
                 != clientVersion)
             {
                 ErrorClose(CloseStatusCode.ProtocolError, "serverVersion != clientVersion");
@@ -184,8 +186,8 @@ namespace GSF
         }
         protected override void OnClose(CloseEventArgs e)
         {
-            T trash;
-            Sessions.TryRemove(UserId, out trash);
+            //T trash;
+            // Sessions.TryRemove(UserId, out trash);
 
             HealthChecker.Remove(this);
         }

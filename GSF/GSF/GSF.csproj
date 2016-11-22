@@ -71,9 +71,16 @@
     <Compile Include="ICheckable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />
+    <Compile Include="WebSocketImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GSF.Packet\GSF.Packet.csproj">
+      <Project>{c52d8896-2a33-47d0-bca4-c9739ef740f8}</Project>
+      <Name>GSF.Packet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
