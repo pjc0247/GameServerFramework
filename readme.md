@@ -40,7 +40,7 @@ class MyGameService : Service {
 ----
 ```cs
 Server.Create(9916)                 // 포트 번호를 지정합니다.
-.WithService<EchoService>("/echo")  // 서비스의 구현체와, 경로를 지정합니다.
+   .WithService<EchoService>("/echo")  // 서비스의 구현체와, 경로를 지정합니다.
     .Run();
 ```
 
