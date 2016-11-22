@@ -8,11 +8,19 @@ using GSF;
 using GSF.Packet;
 using GSF.Packet.Json;
 
+using SamplePacket;
+
 namespace SampleServer
 {
     public class EchoService : Service
     {
-
+        public void OnEchoPacket(EchoPacket packet)
+        {
+            SendPacket(new EchoPacket()
+            {
+                Message = packet.Message
+            });
+        }
     }
 
     public class Program
@@ -22,6 +30,10 @@ namespace SampleServer
             Console.WriteLine("Hi");
 
             PacketSerializer.Protocol = new JsonProtocol();
+
+            Server.Create(9916)
+                .WithService<EchoService>("/echo")
+                .Run();
         }
     }
 }

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0F336EEB-BA9A-4D11-8B27-54AAF1E99AAC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{7CBCA068-E312-43DE-A8DF-68E35535488F}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SampleServer</RootNamespace>
-    <AssemblyName>SampleServer</AssemblyName>
+    <RootNamespace>SamplePacket</RootNamespace>
+    <AssemblyName>SamplePacket</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -29,9 +29,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,35 +38,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Packets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GSF.Packet.Json\GSF.Packet.Json.csproj">
-      <Project>{4216c0f2-f74c-4a84-8a76-8a292f6a2596}</Project>
-      <Name>GSF.Packet.Json</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GSF.Packet\GSF.Packet.csproj">
       <Project>{c52d8896-2a33-47d0-bca4-c9739ef740f8}</Project>
       <Name>GSF.Packet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GSF\GSF.csproj">
-      <Project>{6cc2bb28-1044-4bfc-958e-8665fa7e4503}</Project>
-      <Name>GSF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SamplePacket\SamplePacket.csproj">
-      <Project>{7cbca068-e312-43de-a8df-68e35535488f}</Project>
-      <Name>SamplePacket</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

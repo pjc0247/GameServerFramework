@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSF.Packet", "GSF.Packet\GS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSF.Packet.Json", "GSF.Packet.Json\GSF.Packet.Json.csproj", "{4216C0F2-F74C-4A84-8A76-8A292F6A2596}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamplePacket", "SamplePacket\SamplePacket.csproj", "{7CBCA068-E312-43DE-A8DF-68E35535488F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4216C0F2-F74C-4A84-8A76-8A292F6A2596}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4216C0F2-F74C-4A84-8A76-8A292F6A2596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4216C0F2-F74C-4A84-8A76-8A292F6A2596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CBCA068-E312-43DE-A8DF-68E35535488F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CBCA068-E312-43DE-A8DF-68E35535488F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CBCA068-E312-43DE-A8DF-68E35535488F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CBCA068-E312-43DE-A8DF-68E35535488F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -98,7 +98,7 @@ namespace GSF
                 Console.WriteLine(e);
             }
         }
-        internal virtual void SendPacket(PacketBase packet)
+        protected virtual void SendPacket(PacketBase packet)
         {
             try
             {
@@ -165,7 +165,7 @@ namespace GSF
                 return;
             }
 
-            if (ProtocolCS.Constants.ProtocolVersion.version // TODO
+            if (new Version("1.0.0") // TODO
                 != clientVersion)
             {
                 ErrorClose(CloseStatusCode.ProtocolError, "serverVersion != clientVersion");
