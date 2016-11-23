@@ -14,7 +14,7 @@ namespace GSF
     using Packet;
     using Auth;
 
-    public partial class Service : WebSocketBehavior
+    public partial class Service<T> : WebSocketBehavior
     {
         private static Dictionary<Type, MethodInfo> Handlers { get; set; }
 
@@ -39,12 +39,12 @@ namespace GSF
             }
         }
 
-        public Service()
+        static Service()
         {
             Handlers = new Dictionary<Type, MethodInfo>();
             //Sessions = new ConcurrentDictionary<int, T>();
 
-            var handlerCandidates = GetType().GetMethods(
+            var handlerCandidates = typeof(T).GetMethods(
                 BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.GetParameters().Length == 1)
                 .Where(x => x.GetParameters().First().ParameterType == typeof(PacketBase))

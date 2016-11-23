@@ -12,7 +12,7 @@ using SamplePacket;
 
 namespace SampleServer
 {
-    public class EchoService : Service
+    public class EchoService : Service<EchoService>
     {
         public void OnEchoPacket(EchoPacket packet)
         {

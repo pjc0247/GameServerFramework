@@ -10,8 +10,8 @@ namespace GSF
 
     static class BroadcastExt
     {
-        public static void Broadcast(
-            this IEnumerable<Service> sessions,
+        public static void Broadcast<T>(
+            this IEnumerable<Service<T>> sessions,
             PacketBase packet)
         {
             var json = PacketSerializer.Serialize(packet);
