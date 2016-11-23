@@ -39,7 +39,8 @@ class MyGameService : Service {
 서버 실행시키기
 ----
 ```cs
-Server.Create(9916)                 // 포트 번호를 지정합니다.
+Server.Create(9916)                    // 포트 번호를 지정합니다.
+   .Accepts<IDP.Facebook>("facebook")  // 허용할 로그인 메소드를 지정합니다.
    .WithService<EchoService>("/echo")  // 서비스의 구현체와, 경로를 지정합니다.
    .Run();
 ```
@@ -94,12 +95,17 @@ await ProcessLogin("user_type", "user_id", "access_token");
 __GSF__는 기본적으로 Facebook 로그인을 지원합니다.<br>
 만약 페이스북 이외에 카카오 등 추가적인 로그인 방법이 필요하다면 `IDProvider` 인터페이스를 구현하여 로그인 메소드를 추가할 수 있습니다.
 ```cs
-[IDProviderCode("kakao")]
 class KakaoTalk : IDProvider {
     public Task<bool> IsValidToken(string userId, string accessToken) {
         /* 카카오톡 서버에 userId, accessToken이 일치하는지 물어봅니다 */
     }
 }
+```
+
+이후, 서버를 실행할 시 `Accepts` 메소드를 이용해 해당 IDP를 등록합니다.
+```cs
+Server.Create(9916)
+    .Accepts<KakaoTalk>("kakao")
 ```
 
 로컬 토큰
