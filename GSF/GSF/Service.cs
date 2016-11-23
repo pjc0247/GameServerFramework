@@ -16,6 +16,7 @@ namespace GSF
 
     public partial class Service<T> : WebSocketBehavior
     {
+        private static bool HasICheckable { get; set; }
         private static Dictionary<Type, MethodInfo> Handlers { get; set; }
 
         //private static ConcurrentDictionary<int, T> Sessions { get; set; }
@@ -58,6 +59,9 @@ namespace GSF
 
                 Handlers[packetType] = candidate;
             }
+
+            if (typeof(T).GetInterfaces().Contains(typeof(ICheckable)))
+                HasICheckable = true;
         }
 
         /// <summary>
@@ -174,7 +178,7 @@ namespace GSF
             await ProcessLogin(userType, userId, accessToken);
             #endregion
 
-            if (GetType().GetInterfaces().Contains(typeof(ICheckable)))
+            if (HasICheckable)
                 HealthChecker.Add((ICheckable)this);
         }
         protected override void OnClose(CloseEventArgs e)
@@ -182,7 +186,7 @@ namespace GSF
             //T trash;
             // Sessions.TryRemove(UserId, out trash);
 
-            if (GetType().GetInterfaces().Contains(typeof(ICheckable)))
+            if (HasICheckable)
                 HealthChecker.Remove((ICheckable)this);
         }
         protected override void OnMessage(MessageEventArgs e)
