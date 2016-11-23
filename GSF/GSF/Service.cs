@@ -14,7 +14,7 @@ namespace GSF
     using Packet;
     using Auth;
 
-    public partial class Service : WebSocketBehavior, ICheckable
+    public partial class Service : WebSocketBehavior
     {
         private static Dictionary<Type, MethodInfo> Handlers { get; set; }
 
@@ -139,14 +139,6 @@ namespace GSF
             }
         }
 
-        /// <summary>
-        /// 각각의 서비스들에서 이 메소드를 상속받아 검사를 수행한다.
-        /// </summary>
-        /// <returns>false일 경우 세션 종료</returns>
-        public virtual bool OnHealthCheck()
-        {
-            return true;
-        }
         public void OnDispose()
         {
             ErrorClose(CloseStatusCode.ServerError, "healthcheck failure");
@@ -182,14 +174,16 @@ namespace GSF
             await ProcessLogin(userType, userId, accessToken);
             #endregion
 
-            HealthChecker.Add(this);
+            if (GetType().GetInterfaces().Contains(typeof(ICheckable)))
+                HealthChecker.Add((ICheckable)this);
         }
         protected override void OnClose(CloseEventArgs e)
         {
             //T trash;
             // Sessions.TryRemove(UserId, out trash);
 
-            HealthChecker.Remove(this);
+            if (GetType().GetInterfaces().Contains(typeof(ICheckable)))
+                HealthChecker.Remove((ICheckable)this);
         }
         protected override void OnMessage(MessageEventArgs e)
         {
