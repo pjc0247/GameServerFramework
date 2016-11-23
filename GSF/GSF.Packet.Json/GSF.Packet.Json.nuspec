@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>GameServerFramework.Packet.Json</id>
+    <version>1.0.0-rc1</version>
+    <title>GameServerFramework.Packet.Json</title>
+    <authors>pjc0247</authors>
+    <owners>pjc0247</owners>
+	<projectUrl>https://github.com/pjc0247/GameServerFramework</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>GameServerFramework for .Net</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>websocket GSF</tags>
+  </metadata>
+</package>

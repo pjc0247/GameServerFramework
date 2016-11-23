@@ -38,7 +38,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
@@ -54,6 +53,7 @@
     <Compile Include="Auth\AuthHandler.cs" />
     <Compile Include="Auth\IAccessTokenManager.cs" />
     <Compile Include="Auth\IDP\Facebook.cs" />
+    <Compile Include="Auth\IDP\Guest.cs" />
     <Compile Include="Auth\IDP\IDProvider.cs" />
     <Compile Include="Auth\IDP\Local.cs" />
     <Compile Include="Auth\UserType.cs" />
