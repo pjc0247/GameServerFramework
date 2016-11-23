@@ -16,12 +16,17 @@ namespace GSF
 
     public partial class Service<T> : WebSocketBehavior
     {
-        private static bool HasICheckable { get; set; }
-        private static Dictionary<Type, MethodInfo> Handlers { get; set; }
+        internal Server Server;
+
+        private static bool HasICheckable;
+        private static Dictionary<Type, MethodInfo> Handlers;
 
         //private static ConcurrentDictionary<int, T> Sessions { get; set; }
 
         private int _UserId;
+        /// <summary>
+        /// 현재 세션의 유저 아이디
+        /// </summary>
         public int UserId
         {
             get { return _UserId; }
@@ -128,7 +133,7 @@ namespace GSF
                 if (string.IsNullOrEmpty(userId))
                     throw new ArgumentException(nameof(userId));
 
-                var loggedIn = await AuthHandler.Login(
+                var loggedIn = await Server.AuthHandler.Login(
                     userType, userId, accessToken);
 
                 if (loggedIn == false)

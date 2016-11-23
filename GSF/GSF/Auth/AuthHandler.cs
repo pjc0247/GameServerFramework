@@ -10,27 +10,29 @@ namespace GSF.Auth
 
     class AuthHandler
     {
-        private static Local Local = new Local();
-        private static Facebook Facebook = new Facebook();
+        private Dictionary<string, IDProvider> IDProviders
+            = new Dictionary<string, IDProvider>();
 
-        public static async Task<bool> Login(
+        public AuthHandler()
+        {
+            AddIDProvider<Guest>(UserType.Guest);
+            AddIDProvider<Local>(UserType.Local);
+        }
+
+        public void AddIDProvider<T>(string userType)
+            where T : IDProvider, new()
+        {
+            IDProviders.Add(userType, new T());
+        }
+
+        public async Task<bool> Login(
             string userType,
             string userId, string accessToken)
         {
-            /* TODO : 이곳에 IDP 핸들러들을 추가한다 */
+            if (IDProviders.ContainsKey(userType) == false)
+                throw new NotSupportedException("unknown userType");
 
-            // 게스트는 별도의 accessToken을 가지고 있지 않으며
-            // 항상 성공한다.
-            if (userType == UserType.Guest)
-                return true;
-
-            if (userType == UserType.Local)
-                return await Local.IsValidToken(userId, accessToken);
-
-            if (userType == UserType.Facebook)
-                return await Facebook.IsValidToken(userId, accessToken);
-
-            throw new NotSupportedException("unknown userType");
+            return await IDProviders[userType].IsValidToken(userId, accessToken);
         }
     }
 }

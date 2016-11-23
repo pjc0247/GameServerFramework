@@ -9,6 +9,7 @@ using WebSocketSharp.Server;
 
 namespace GSF
 {
+    // NOT USED
     class WebSocketImpl : WebSocketBehavior
     {
         public virtual bool IsAlive
