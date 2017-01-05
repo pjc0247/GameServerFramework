@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GSF.Concurrency
 {
-    class BoundTaskPool
+    public class BoundTaskPool
     {
         private static readonly int MaxPoolSize = 4;
 

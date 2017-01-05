@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GSF.Concurrency
 {
-    class ConcurrentSet<T>
+    public class ConcurrentSet<T>
     {
         private ConcurrentDictionary<T, T> Dic { get; set; }
 

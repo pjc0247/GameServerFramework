@@ -7,5 +7,6 @@ namespace GSF.Packet
 {
     public class PacketBase
     {
+        public long PacketId { get; set; }
     }
 }

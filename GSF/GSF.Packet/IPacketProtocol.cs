@@ -7,9 +7,9 @@ namespace GSF.Packet
 {
     public interface IPacketProtocol
     {
-        string Serialize<T>(T packet)
+        byte[] Serialize<T>(T packet)
             where T : PacketBase;
 
-        PacketBase Deserialize(string data);
+        PacketBase Deserialize(byte[] data);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GSF // 편의를 위해 네임스페이스 생략
 {
-    enum As
+    public enum As
     {
         SingleConsumer,
         MultiProducer,
@@ -15,7 +15,7 @@ namespace GSF // 편의를 위해 네임스페이스 생략
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
-    class ThreadSafe : Attribute
+    public class ThreadSafe : Attribute
     {
         public ThreadSafe()
         {
@@ -26,7 +26,7 @@ namespace GSF // 편의를 위해 네임스페이스 생략
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
-    class NotThreadSafe : Attribute
+    public class NotThreadSafe : Attribute
     {
         public NotThreadSafe()
         {

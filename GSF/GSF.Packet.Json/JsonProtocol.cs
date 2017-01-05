@@ -10,21 +10,28 @@ namespace GSF.Packet.Json
 {
     public class JsonProtocol : IPacketProtocol
     {
-        public PacketBase Deserialize(string data)
+        protected JsonSerializerSettings JsonSettings { get; set; }
+
+        public JsonProtocol()
         {
-            return (PacketBase)JsonConvert.DeserializeObject(data);
+            JsonSettings = new JsonSerializerSettings();
+            JsonSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
+            JsonSettings.TypeNameHandling = TypeNameHandling.All;
         }
 
-        public string Serialize<T>(T packet)
+        public PacketBase Deserialize(byte[] data)
+        {
+            var json = Encoding.UTF8.GetString(data);
+
+            return (PacketBase)JsonConvert.DeserializeObject(json, JsonSettings);
+        }
+
+        public byte[] Serialize<T>(T packet)
             where T : PacketBase
         {
-            var setting = new JsonSerializerSettings()
-            {
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full
-            };
-            var json = JsonConvert.SerializeObject(packet);
+            var json = JsonConvert.SerializeObject(packet, JsonSettings);
 
-            return json;
+            return Encoding.UTF8.GetBytes(json);
         }
     }
 }

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>GameServerFramework</id>
-    <version>1.0.0-rc2</version>
+    <version>1.0.0-rc4</version>
     <title>GameServerFramework</title>
     <authors>pjc0247</authors>
     <owners>pjc0247</owners>
@@ -11,6 +11,6 @@
     <description>GameServerFramework for .Net</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2016</copyright>
-    <tags>websocket</tags>
+    <tags>websocket GSF</tags>
   </metadata>
 </package>

@@ -30,7 +30,11 @@ namespace GSF
 
         private Server(int port)
         {
-            WebSocket = new WebSocketServer(port);
+            WebSocket = new WebSocketServer(port)
+            {
+                ReuseAddress = true,
+                KeepClean = true
+            };
             AuthHandler = new AuthHandler();
         }
 
@@ -77,6 +81,11 @@ namespace GSF
         public void Run()
         {
             WebSocket.Start();
+        }
+
+        public void Stop(string reason)
+        {
+            WebSocket.Stop(CloseStatusCode.Away, reason);
         }
     }
 }

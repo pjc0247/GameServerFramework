@@ -9,7 +9,7 @@ namespace GSF.Packet
     {
         public static IPacketProtocol Protocol { get; set; }
 
-        public static string Serialize<T>(T packet)
+        public static byte[] Serialize<T>(T packet)
             where T : PacketBase
         {
             if (packet == null)
@@ -18,9 +18,9 @@ namespace GSF.Packet
             return Protocol.Serialize(packet);
         }
 
-        public static PacketBase Deserialize(string data)
+        public static PacketBase Deserialize(byte[] data)
         {
-            if (string.IsNullOrEmpty(data))
+            if (data == null || data.Length == 0)
                 throw new ArgumentException("data");
 
             return Protocol.Deserialize(data);

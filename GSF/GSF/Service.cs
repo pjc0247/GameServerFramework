@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
 
@@ -20,6 +21,8 @@ namespace GSF
 
         private static bool HasICheckable;
         private static Dictionary<Type, MethodInfo> Handlers;
+
+        private int LastPacketId = 0;
 
         //private static ConcurrentDictionary<int, T> Sessions { get; set; }
 
@@ -53,7 +56,7 @@ namespace GSF
             var handlerCandidates = typeof(T).GetMethods(
                 BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.GetParameters().Length == 1)
-                .Where(x => x.GetParameters().First().ParameterType == typeof(PacketBase))
+                .Where(x => x.GetParameters().First().ParameterType.IsSubclassOf(typeof(PacketBase)))
                 .Where(x => x.ReturnType == typeof(void));
 
             foreach (var candidate in handlerCandidates)
@@ -96,7 +99,7 @@ namespace GSF
             base.Sessions.CloseSession(this.ID, code, reason);
         }
 
-        internal virtual void SendRawPacket(string packet)
+        protected internal virtual void SendRawPacket(string packet)
         {
             try
             {
@@ -107,10 +110,13 @@ namespace GSF
                 Console.WriteLine(e);
             }
         }
-        protected virtual void SendPacket(PacketBase packet)
+        protected internal virtual void SendPacket(PacketBase packet)
         {
             try
             {
+                if (packet.PacketId == 0)
+                    packet.PacketId = Interlocked.Increment(ref LastPacketId);
+
                 var json = PacketSerializer.Serialize(packet);
 
                 SendRawPacket(json);
@@ -119,6 +125,12 @@ namespace GSF
             {
                 Console.WriteLine(e);
             }
+        }
+        protected void SendReplyPacket(PacketBase received, PacketBase packet)
+        {
+            packet.PacketId = received.PacketId;
+
+            SendPacket(packet);
         }
 
         protected async Task ProcessLogin(
@@ -196,18 +208,19 @@ namespace GSF
         }
         protected override void OnMessage(MessageEventArgs e)
         {
-            var json = e.Data;
             object packet = null;
 
+            /*
             if (e.IsText == false)
             {
                 ErrorClose(CloseStatusCode.ProtocolError, "only json data accepted");
                 return;
             }
-            
+            */
+
             try
             {
-                packet = PacketSerializer.Deserialize(json);
+                packet = PacketSerializer.Deserialize(e.RawData);
             }
             catch (Exception ex)
             {

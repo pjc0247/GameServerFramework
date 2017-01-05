@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GSF.Concurrency
 {
-    class BoundTask
+    public class BoundTask
     {
         public int Id { get; set; }
 

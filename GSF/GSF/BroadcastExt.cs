@@ -8,7 +8,7 @@ namespace GSF
 {
     using Packet;
 
-    static class BroadcastExt
+    public static class BroadcastExt
     {
         public static void Broadcast<T>(
             this IEnumerable<Service<T>> sessions,
