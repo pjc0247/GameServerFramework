@@ -14,7 +14,7 @@ namespace GSF
             this IEnumerable<Service<T>> sessions,
             PacketBase packet)
         {
-            var json = PacketSerializer.Serialize(packet);
+			var json = Encoding.UTF8.GetString(PacketSerializer.Serialize(packet));
             
             foreach(var session in sessions)
                 session.SendRawPacket(json);

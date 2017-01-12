@@ -117,7 +117,7 @@ namespace GSF
                 if (packet.PacketId == 0)
                     packet.PacketId = Interlocked.Increment(ref LastPacketId);
 
-                var json = PacketSerializer.Serialize(packet);
+				var json = Encoding.UTF8.GetString(PacketSerializer.Serialize(packet));
 
                 SendRawPacket(json);
             }
