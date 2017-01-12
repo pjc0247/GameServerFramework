@@ -21,11 +21,11 @@ namespace GSF.Ez.Packet
         public Dictionary<string, object> Property;
     }
 
-    public class ModifyPlayerProperty
+    public class ModifyPlayerProperty : PacketBase
     {
         public Dictionary<string, object> Property;
     }
-    public class ModifyWorldProperty
+    public class ModifyWorldProperty : PacketBase
     {
         public Dictionary<string, object> Property;
     }
