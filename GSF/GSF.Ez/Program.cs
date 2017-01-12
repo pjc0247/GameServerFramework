@@ -17,21 +17,64 @@ using Newtonsoft.Json.Linq;
 
 namespace GSF.Ez
 {
+	public class Config
+	{
+		public string OptionalPropertyDataSource;
+		public string WorldPropertyDataSource;
+
+		public Dictionary<string, object> WorldProperty;
+		public Dictionary<string, object> OptionalProperty;
+	}
+
 	public class InitializationService
 	{
-		private static string DataSource = "https://jwvgtest.azurewebsites.net/api/GenerateMapData?code=ifMbPygn7iCbYduURc/zX/n2gJzD0lEqG1ej5apWKaacEhSC8DK6MA==";
+		private static Config config;
+
+		private static readonly string ConfigPath = "config.json";
+
+		private static void LoadConfig()
+		{
+			if (File.Exists(ConfigPath) == false)
+			{
+				config = new Config();
+				return;
+			}
+
+			var json = File.ReadAllText(ConfigPath);
+			config = JsonConvert.DeserializeObject<Config>(json);
+
+			Console.WriteLine("LoadConfig");
+			Console.WriteLine(json);
+		}
+
+		private static JObject LoadPropertyFromDataSource(string uri)
+		{
+			var http = new HttpClient();
+			var json = http.GetAsync(config.OptionalPropertyDataSource).Result.Content.ReadAsStringAsync().Result;
+
+			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+			return (JObject)jobj["worldProperty"];
+		}
 
 		public static void Init()
 		{
-			var http = new HttpClient();
-			var json = http.GetAsync(DataSource).Result.Content.ReadAsStringAsync().Result;
+			LoadConfig();
 
-			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-			var property = (JObject)jobj["worldProperty"];
+			// from DefaultValue
+			if (config.OptionalProperty != null)
+				EzService.OptionalWorldProperty = config.OptionalProperty;
+			if (config.WorldProperty != null)
+				EzService.WorldProperty = config.WorldProperty;
 
-			foreach (var pair in property)
+			// from DataSource
+			if (string.IsNullOrEmpty(config.OptionalPropertyDataSource) == false) {
+				foreach (var pair in LoadPropertyFromDataSource(config.OptionalPropertyDataSource))
+					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
+			}
+			if (string.IsNullOrEmpty(config.WorldPropertyDataSource) == false)
 			{
-				EzService.WorldProperty[pair.Key] = pair.Value;
+				foreach (var pair in LoadPropertyFromDataSource(config.WorldPropertyDataSource))
+					EzService.WorldProperty[pair.Key] = pair.Value;
 			}
 		}
 	}
