@@ -25,6 +25,11 @@ namespace GSF.Ez
                 foreach (var pair in packet.Property)
                     WorldProperty[pair.Key] = pair.Value;
             }
+
+			lock (Sessions)
+			{
+				Sessions.Broadcast(packet);
+			}
         }
         public void OnModifyPlayerProperty(ModifyPlayerProperty packet)
         {
