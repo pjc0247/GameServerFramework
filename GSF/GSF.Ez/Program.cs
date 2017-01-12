@@ -50,7 +50,7 @@ namespace GSF.Ez
 		private static JObject LoadPropertyFromDataSource(string uri)
 		{
 			var http = new HttpClient();
-			var json = http.GetAsync(config.OptionalPropertyDataSource).Result.Content.ReadAsStringAsync().Result;
+			var json = http.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
 
 			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 			return (JObject)jobj["worldProperty"];
@@ -68,11 +68,13 @@ namespace GSF.Ez
 
 			// from DataSource
 			if (string.IsNullOrEmpty(config.OptionalPropertyDataSource) == false) {
+				Console.WriteLine("Load OptionalWorldProperty from DataSource");
 				foreach (var pair in LoadPropertyFromDataSource(config.OptionalPropertyDataSource))
 					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
 			}
 			if (string.IsNullOrEmpty(config.WorldPropertyDataSource) == false)
 			{
+				Console.WriteLine("Load WorldProperty from DataSource");
 				foreach (var pair in LoadPropertyFromDataSource(config.WorldPropertyDataSource))
 					EzService.WorldProperty[pair.Key] = pair.Value;
 			}
