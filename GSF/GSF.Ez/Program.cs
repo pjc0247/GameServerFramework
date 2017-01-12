@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using GSF;
@@ -9,12 +11,34 @@ using GSF.Packet;
 using GSF.Packet.Json;
 using GSF.Ez.Packet;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace GSF.Ez
 {
+	public class InitializationService
+	{
+		private static string DataSource = "https://jwvgtest.azurewebsites.net/api/GenerateMapData?code=ifMbPygn7iCbYduURc/zX/n2gJzD0lEqG1ej5apWKaacEhSC8DK6MA==";
+
+		public static void Init()
+		{
+			var http = new HttpClient();
+			var json = http.GetAsync(DataSource).Result.Content.ReadAsStringAsync().Result;
+
+			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+			var property = (JObject)jobj["worldProperty"];
+
+			foreach (var pair in property)
+			{
+				EzService.WorldProperty[pair.Key] = pair.Value;
+			}
+		}
+	}
+
     public class EzService : Service<EzService>
     {
         private static List<EzService> Sessions = new List<EzService>();
-        private static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
+        public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
 
         private EzPlayer Player;
 
@@ -96,6 +120,8 @@ namespace GSF.Ez
         public static void Main(string[] args)
         {
             Console.WriteLine("Ez");
+
+			InitializationService.Init();
 
             PacketSerializer.Protocol = new JsonProtocol();
 
