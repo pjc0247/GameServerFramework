@@ -56,6 +56,7 @@ namespace SampleClient
 
             SendPacket(ws, new RequestBroadcast()
             {
+                Type = 1,
                 Data = new Dictionary<string, object>()
                 {
                     {"a", "B"}

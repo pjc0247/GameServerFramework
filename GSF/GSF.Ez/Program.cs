@@ -18,17 +18,34 @@ namespace GSF.Ez
 
         private EzPlayer Player;
 
+        public void OnModifyWorldProperty(ModifyWorldProperty packet)
+        {
+            lock (WorldProperty)
+            {
+                foreach (var pair in packet.Property)
+                    WorldProperty[pair.Key] = pair.Value;
+            }
+        }
+        public void OnModifyPlayerProperty(ModifyPlayerProperty packet)
+        {
+            foreach (var pair in packet.Property)
+                Player.Property[pair.Key] = pair.Value;
+        }
+
         public void OnJoinPlayer(JoinPlayer packet)
         {
             lock (Sessions)
             {
                 Sessions.Broadcast(packet);
 
-                SendPacket(new WorldInfo()
+                lock (WorldProperty)
                 {
-                    Players = Sessions.Select(x => x.Player).ToArray(),
-                    Property = WorldProperty
-                });
+                    SendPacket(new WorldInfo()
+                    {
+                        Players = Sessions.Select(x => x.Player).ToArray(),
+                        Property = WorldProperty
+                    });
+                }
 
                 Sessions.Add(this);
             }

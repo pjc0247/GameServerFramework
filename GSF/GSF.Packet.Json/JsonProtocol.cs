@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace GSF.Packet.Json
 {
-    class CustomBinder : System.Runtime.Serialization.SerializationBinder
+    /*
+    class CustomBinder : ISerializationBinder
     {
-        public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
+        public void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
             assemblyName = null;
             typeName = serializedType.FullName + ", " + serializedType.Assembly.FullName;
         }
-        public override Type BindToType(string assemblyName, string typeName)
+        public Type BindToType(string assemblyName, string typeName)
         {
             if (typeName.StartsWith("GSF"))
                 return System.Reflection.Assembly.Load(assemblyName).GetType(typeName);
@@ -23,6 +24,7 @@ namespace GSF.Packet.Json
             return typeof(Dictionary<string, object>);
         }
     }
+    */
 
     public class JsonProtocol : IPacketProtocol
     {
@@ -31,9 +33,10 @@ namespace GSF.Packet.Json
         public JsonProtocol()
         {
             JsonSettings = new JsonSerializerSettings();
-            JsonSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+            //JsonSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+            JsonSettings.TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
             JsonSettings.TypeNameHandling = TypeNameHandling.Objects;
-            JsonSettings.Binder = new CustomBinder();
+            //JsonSettings.SerializationBinder = new CustomBinder();
         }
 
         public PacketBase Deserialize(byte[] data)

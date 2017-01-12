@@ -21,6 +21,15 @@ namespace GSF.Ez.Packet
         public Dictionary<string, object> Property;
     }
 
+    public class ModifyPlayerProperty
+    {
+        public Dictionary<string, object> Property;
+    }
+    public class ModifyWorldProperty
+    {
+        public Dictionary<string, object> Property;
+    }
+
     public class JoinPlayer : PacketBase
     {
         public EzPlayer Player;
