@@ -67,7 +67,7 @@ namespace GSF.Ez
 			if (File.Exists("players\\" + packet.Player.PlayerId))
 			{
 				var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
-				packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
+				packet.Player =JsonConvert.DeserializeObject<EzPlayer>(json);
 			}
 
             lock (Sessions)
