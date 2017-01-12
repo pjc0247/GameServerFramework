@@ -8,6 +8,22 @@ using Newtonsoft.Json;
 
 namespace GSF.Packet.Json
 {
+    class CustomBinder : System.Runtime.Serialization.SerializationBinder
+    {
+        public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
+        {
+            assemblyName = null;
+            typeName = serializedType.FullName + ", " + serializedType.Assembly.FullName;
+        }
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            if (typeName.StartsWith("GSF"))
+                return System.Reflection.Assembly.Load(assemblyName).GetType(typeName);
+
+            return typeof(Dictionary<string, object>);
+        }
+    }
+
     public class JsonProtocol : IPacketProtocol
     {
         protected JsonSerializerSettings JsonSettings { get; set; }
@@ -15,8 +31,9 @@ namespace GSF.Packet.Json
         public JsonProtocol()
         {
             JsonSettings = new JsonSerializerSettings();
-            JsonSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
-            JsonSettings.TypeNameHandling = TypeNameHandling.All;
+            JsonSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+            JsonSettings.TypeNameHandling = TypeNameHandling.Objects;
+            JsonSettings.Binder = new CustomBinder();
         }
 
         public PacketBase Deserialize(byte[] data)

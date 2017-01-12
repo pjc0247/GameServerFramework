@@ -164,6 +164,10 @@ namespace GSF
         {
             ErrorClose(CloseStatusCode.ServerError, "healthcheck failure");
         }
+        protected virtual void OnSessionClosed()
+        {
+
+        }
 
         protected override async void OnOpen()
         {
@@ -203,6 +207,8 @@ namespace GSF
             //T trash;
             // Sessions.TryRemove(UserId, out trash);
 
+            OnSessionClosed();
+
             if (HasICheckable)
                 HealthChecker.Remove((ICheckable)this);
         }
@@ -229,11 +235,13 @@ namespace GSF
             if (packet == null)
             {
                 Console.WriteLine($"Parsing Error : {e.Data}");
+                Console.WriteLine(Encoding.UTF8.GetString(e.RawData));
                 ErrorClose(CloseStatusCode.InvalidData, "parsing error");
             }
             else if (Handlers.ContainsKey(packet.GetType()) == false)
             {
                 Console.WriteLine($"Unkown Packet : {e.Data}");
+                Console.WriteLine(Encoding.UTF8.GetString(e.RawData));
                 ErrorClose(CloseStatusCode.InvalidData, "unknown packet");
             }
             else

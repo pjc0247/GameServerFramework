@@ -9,11 +9,18 @@ using WebSocketSharp;
 using GSF.Packet;
 using GSF.Packet.Json;
 using GSF.Ranking;
+using GSF.Ez.Packet;
 
 using SamplePacket;
 
 namespace SampleClient
 {
+
+    class Foo : PacketBase
+    {
+        public string Value;
+    }
+
     class Program
     {
 
@@ -34,14 +41,28 @@ namespace SampleClient
             ws.Connect();
 
             Console.WriteLine("IsAlive : " + ws.IsAlive);
+            
+            SendPacket(ws, new JoinPlayer()
+            {
+                Player = new EzPlayer()
+                {
+                    UserId = 1234,
+                    Property = new Dictionary<string, object>()
+                    {
+                        {"nickname", "jwvg"}
+                    }
+                }
+            });
+
+            SendPacket(ws, new RequestBroadcast()
+            {
+                Data = new Dictionary<string, object>()
+                {
+                    {"a", "B"}
+                }
+            });
 
             /*
-            SendPacket(ws, new EchoPacket()
-            {
-                Message = "message"
-            });
-            */
-
             SendPacket(ws, new AddScore()
             {
                 RankingKey = "level",
@@ -66,9 +87,9 @@ namespace SampleClient
                 RankingKey = "level",
                 Player = new GSF.Player() { PlayerId = "player3" }
             });
+            */
 
             ws.OnMessage += Ws_OnMessage;
-
 
             Console.ReadLine();
         }

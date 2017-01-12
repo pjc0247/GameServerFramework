@@ -21,12 +21,6 @@ namespace SampleServer
             {
                 Message = packet.Message
             });
-
-            Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
-
-            System.Threading.Thread.Sleep(100000);
-
-            Console.WriteLine("END");
         }
     }
 
@@ -34,15 +28,13 @@ namespace SampleServer
     {
         public static void Main(string[] args)
         {
-            GSF.Ranking.RankingService.Test();
-
             Console.WriteLine("Hi");
 
             PacketSerializer.Protocol = new JsonProtocol();
 
             Server.Create(9916)
-                //.WithService<EchoService>("/echo")
-                .WithService<GSF.Ranking.RankingService>("/echo")
+                .WithService<EchoService>("/echo")
+                //.WithService<GSF.Ranking.RankingService>("/echo")
                 .Run();
 
             Console.ReadLine();

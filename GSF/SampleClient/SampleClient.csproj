@@ -55,6 +55,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GSF.Ez.Packet\GSF.Ez.Packet.csproj">
+      <Project>{793fb040-0260-4ebc-96a2-9c11fc17785b}</Project>
+      <Name>GSF.Ez.Packet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GSF.Ez\GSF.Ez.csproj">
+      <Project>{f3f3454a-23bf-437b-ab86-3a5744949b09}</Project>
+      <Name>GSF.Ez</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GSF.Packet.Json\GSF.Packet.Json.csproj">
       <Project>{4216c0f2-f74c-4a84-8a76-8a292f6a2596}</Project>
       <Name>GSF.Packet.Json</Name>
