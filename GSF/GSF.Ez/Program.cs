@@ -40,9 +40,39 @@ namespace GSF.Ez
     {
         private static List<EzService> Sessions = new List<EzService>();
         public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
+		public static Dictionary<string, object> OptionalWorldProperty = new Dictionary<string, object>();
 
         private EzPlayer Player;
 
+		public void OnRequestOptionalWorldProperty(RequestOptionalWorldProperty packet)
+		{
+			var dic = new Dictionary<string, object>();
+
+			lock (OptionalWorldProperty)
+			{
+				foreach (var key in packet.Keys)
+					dic[key] = OptionalWorldProperty[key];
+			}
+
+			SendPacket(new OptionalWorldProperty()
+			{
+				Property = dic
+			});
+		}
+
+		public void OnModifyOptionalWorldProperty(ModifyOptionalWorldProperty packet)
+		{
+			lock (OptionalWorldProperty)
+			{
+				foreach (var pair in packet.Property)
+					OptionalWorldProperty[pair.Key] = pair.Value;
+			}
+
+			lock (Sessions)
+			{
+				Sessions.Broadcast(packet);
+			}
+		}
         public void OnModifyWorldProperty(ModifyWorldProperty packet)
         {
             lock (WorldProperty)
