@@ -1,149 +1,202 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 
-using GSF;
+using WebSocketSharp;
+using WebSocketSharp.Net;
+
+using UnityEngine;
+
 using GSF.Packet;
-using GSF.Packet.Json;
 using GSF.Ez.Packet;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace GSF.Ez
+public class EzClient : MonoBehaviour
 {
-	public class InitializationService
-	{
-		private static string DataSource = "https://jwvgtest.azurewebsites.net/api/GenerateMapData?code=ifMbPygn7iCbYduURc/zX/n2gJzD0lEqG1ej5apWKaacEhSC8DK6MA==";
+    #region DELEGATE
+    public delegate void JoinPlayerCallback(JoinPlayer packet);
+    public delegate void LeavePlayerCallback(LeavePlayer packet);
+    public delegate void CustomPacketCallback(BroadcastPacket packet);
+    public delegate void ModifyWorldPropertyCallback(ModifyWorldProperty packet);
+    #endregion
 
-		public static void Init()
-		{
-			var http = new HttpClient();
-			var json = http.GetAsync(DataSource).Result.Content.ReadAsStringAsync().Result;
+    public JoinPlayerCallback onJoinPlayer;
+    public LeavePlayerCallback onLeavePlayer;
+    public CustomPacketCallback onCustomPacket;
+    public ModifyWorldPropertyCallback onModifyWorldProperty;
 
-			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-			var property = (JObject)jobj["worldProperty"];
+    public EzPlayer player;
+    public List<EzPlayer> players;
+    public Dictionary<string, object> worldProperty;
 
-			foreach (var pair in property)
-			{
-				EzService.WorldProperty[pair.Key] = pair.Value;
-			}
-		}
-	}
+    private List<Action> tasks;
 
-    public class EzService : Service<EzService>
+    private string host;
+    private WebSocket ws;
+
+    public static EzClient Connect(string host, string playerId, Dictionary<string, object> property)
     {
-        private static List<EzService> Sessions = new List<EzService>();
-        public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
+        var gobj = new GameObject("EzClientObj");
+        var ezclient = gobj.AddComponent<EzClient>();
 
-        private EzPlayer Player;
+        PacketSerializer.Protocol = new GSF.Packet.Json.JsonProtocol();
 
-        public void OnModifyWorldProperty(ModifyWorldProperty packet)
+        ezclient.host = host;
+        ezclient.worldProperty = new Dictionary<string, object>();
+        ezclient.player = new EzPlayer()
         {
-            lock (WorldProperty)
-            {
-                foreach (var pair in packet.Property)
-                    WorldProperty[pair.Key] = pair.Value;
-            }
+            PlayerId = playerId,
+            Property = property
+        };
+        ezclient.players = new List<EzPlayer>() { ezclient.player };
 
-			lock (Sessions)
-			{
-				Sessions.Broadcast(packet);
-			}
-        }
-        public void OnModifyPlayerProperty(ModifyPlayerProperty packet)
-        {
-            foreach (var pair in packet.Property)
-                Player.Property[pair.Key] = pair.Value;
-        }
+        ezclient.tasks = new List<Action>();
 
-        public void OnJoinPlayer(JoinPlayer packet)
-        {
-			if (File.Exists("players\\" + packet.Player.PlayerId))
-			{
-				var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
-				packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
-			}
-
-            lock (Sessions)
-            {
-                Sessions.Broadcast(packet);
-
-                lock (WorldProperty)
-                {
-                    SendPacket(new WorldInfo()
-                    {
-                        Players = Sessions.Select(x => x.Player).ToArray(),
-                        Property = WorldProperty
-                    });
-                }
-
-                Sessions.Add(this);
-            }
-
-            Player = packet.Player;
-        }
-        public void OnLeavePlayer(LeavePlayer packet)
-        {
-            if (Player == null) return;
-
-            lock (Sessions)
-            {
-                Sessions.Remove(this);
-                Sessions.Broadcast(new LeavePlayer()
-                {
-                    Player = Player
-                });
-            }
-
-			var json = JsonConvert.SerializeObject(Player);
-			File.WriteAllText("players\\" + Player.PlayerId, json);
-            Player = null;
-        }
-        protected override void OnSessionClosed()
-        {
-            OnLeavePlayer(null);
-        }
-
-        public void OnRequestBroadcast(RequestBroadcast packet)
-        {
-            lock (Sessions)
-            {
-                Sessions.Broadcast(new BroadcastPacket()
-                {
-                    Sender = Player,
-
-                    Type = packet.Type,
-                    Data = packet.Data                    
-                });
-            }
-        }
+        return ezclient;
     }
 
-    public class Program
+    void Start()
     {
-        public static void Main(string[] args)
+        DontDestroyOnLoad(gameObject);
+
+        ws = new WebSocket(host);
+        ws.OnOpen += Ws_OnOpen;
+        ws.OnError += Ws_OnError;
+        ws.OnClose += Ws_OnClose;
+        ws.OnMessage += Ws_OnMessage;
+
+        ws.Connect();
+    }
+    void Update()
+    {
+        List<Action> tasksCopy = null;
+
+        lock (tasks)
         {
-            Console.WriteLine("Ez");
-
-			InitializationService.Init();
-
-			if (Directory.Exists("players") == false)
-				Directory.CreateDirectory("players");
-
-            PacketSerializer.Protocol = new JsonProtocol();
-
-            Server.Create(9916)
-                .WithService<EzService>("/echo")
-                //.WithService<GSF.Ranking.RankingService>("/echo")
-                .Run();
-
-            Console.ReadLine();
+            tasksCopy = new List<Action>(tasks);
+            tasks.Clear();
         }
+
+        foreach (var task in tasksCopy)
+            task.Invoke();
+    }
+
+    private void Ws_OnOpen(object sender, EventArgs e)
+    {
+        Debug.Log("OpWebSocketOpen");
+
+        Send(new JoinPlayer()
+        {
+            Player = player
+        });
+    }
+
+    private void Ws_OnError(object sender, ErrorEventArgs e)
+    {
+        Debug.LogError("OnWebSocketError : " + e.Message);
+    }
+
+    private void Ws_OnClose(object sender, CloseEventArgs e)
+    {
+        Debug.LogWarning("OnWebSocketClose : " + e.Reason);
+    }
+
+    private void Ws_OnMessage(object sender, MessageEventArgs e)
+    {
+        Debug.Log("OnWebSocketMessage : " + e.Data);
+
+        var packet = PacketSerializer.Deserialize(e.RawData);
+
+        if (packet is WorldInfo)
+            ProcessWorldInfo((WorldInfo)packet);
+        else if (packet is ModifyWorldProperty)
+            ProcessModifyWorldProperty((ModifyWorldProperty)packet);
+        else if (packet is JoinPlayer)
+            ProcessJoinPlayer((JoinPlayer)packet);
+        else if (packet is LeavePlayer)
+            ProcessLeavePlayer((LeavePlayer)packet);
+        else if (packet is BroadcastPacket)
+            ProcessBroadcastPacket((BroadcastPacket)packet);
+    }
+
+    private void AddTask(Action action)
+    {
+        lock (tasks)
+            tasks.Add(action);
+    }
+    private void ProcessWorldInfo(WorldInfo packet)
+    {
+        players = new List<EzPlayer>(packet.Players);
+        players.Add(player);
+        worldProperty = packet.Property;
+    }
+    private void ProcessModifyWorldProperty(ModifyWorldProperty packet)
+    {
+        foreach (var pair in packet.Property)
+            worldProperty[pair.Key] = pair.Value;
+
+        if (onModifyWorldProperty != null)
+            AddTask(() => onModifyWorldProperty.Invoke(packet));
+    }
+    private void ProcessJoinPlayer(JoinPlayer packet)
+    {
+        players.Add(packet.Player);
+
+        if (onJoinPlayer != null)
+            AddTask(() => onJoinPlayer.Invoke(packet));
+    }
+    private void ProcessLeavePlayer(LeavePlayer packet)
+    {
+        players.Remove(packet.Player);
+
+        if (onLeavePlayer != null)
+            AddTask(() => onLeavePlayer.Invoke(packet));
+    }
+    private void ProcessBroadcastPacket(BroadcastPacket packet)
+    {
+        if (onCustomPacket != null)
+            AddTask(() => onCustomPacket.Invoke(packet));
+    }
+
+    private void Send(PacketBase packet)
+    {
+        Debug.Log("Send : " + packet);
+
+        var json = PacketSerializer.Serialize(packet);
+        ws.Send(json);
+    }
+
+    public void SendPacket(int packetType, Dictionary<string, object> data)
+    {
+        Send(new RequestBroadcast()
+        {
+            Type = packetType,
+            Data = data
+        });
+    }
+    public void SetPlayerProperty(Dictionary<string, object> property)
+    {
+        Send(new ModifyPlayerProperty()
+        {
+            Property = property
+        });
+    }
+    public void SetWorldProperty(Dictionary<string, object> property)
+    {
+        Send(new ModifyWorldProperty()
+        {
+            Property = property
+        });
+    }
+    public void SetWorldProperty(string key, object value)
+    {
+        SetWorldProperty(new Dictionary<string, object>() {
+            {key, value}
+        });
+    }
+    /// <summary>
+    /// 연결을 끊는다.
+    /// </summary>
+    public void Disconnect()
+    {
+        ws.Close();
     }
 }
