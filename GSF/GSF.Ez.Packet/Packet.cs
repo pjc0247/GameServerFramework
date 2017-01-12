@@ -9,7 +9,7 @@ namespace GSF.Ez.Packet
 
     public class EzPlayer
     {
-        public long UserId;
+        public string PlayerId;
 
         public Dictionary<string, object> Property;
     }

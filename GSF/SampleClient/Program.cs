@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +46,7 @@ namespace SampleClient
             {
                 Player = new EzPlayer()
                 {
-                    UserId = 1234,
+                    PlayerId = 1234,
                     Property = new Dictionary<string, object>()
                     {
                         {"nickname", "jwvg"}

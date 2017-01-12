@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -63,6 +64,12 @@ namespace GSF.Ez
 
         public void OnJoinPlayer(JoinPlayer packet)
         {
+			if (File.Exists("players\\" + packet.Player.PlayerId))
+			{
+				var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
+				packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
+			}
+
             lock (Sessions)
             {
                 Sessions.Broadcast(packet);
@@ -93,6 +100,9 @@ namespace GSF.Ez
                     Player = Player
                 });
             }
+
+			var json = JsonConvert.SerializeObject(Player);
+			File.WriteAllText("players\\" + Player.PlayerId, json);
             Player = null;
         }
         protected override void OnSessionClosed()
@@ -122,6 +132,9 @@ namespace GSF.Ez
             Console.WriteLine("Ez");
 
 			InitializationService.Init();
+
+			if (Directory.Exists("players") == false)
+				Directory.CreateDirectory("players");
 
             PacketSerializer.Protocol = new JsonProtocol();
 
