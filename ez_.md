@@ -42,3 +42,40 @@ SendPacket(new LeavePlayer() {
 });
 ```
 或は、Clientから接続を切れてもサーバーは`LeavePlayer`を送信します。
+
+
+Broadcast
+----
+```cs
+enum PacketType {
+    MoveUnit = 1
+};
+```
+```cs
+SendPacket(new RequestBroadcast() {
+    Type = PacketType.MoveUnit,
+    Data = new Dictionary<string, object>()
+    {
+        {"x", "0"},
+        {"y", "0"},
+    }
+});
+```
+`RequestBroadcast`を使用して他のプレイヤーたちにパケットを伝送することができます。<br>
+
+* `Type`はパケットを仕分けするためのintegerです。
+* `Data`はパケットの実際ダーターを含めます。
+
+サーバーは受信した`RequestBroadcast`パケットを`BroadcastPacket`で変換して全てのClientたちに伝達します。
+
+```cs
+public void OnBroadcastPacket(BroadcastPacket packet) {
+    if (packet.Type == PacketType.MoveUnit) {
+        var player = packet.Sender;
+        int x = (int)packet.Data["x"];
+        int y = (int)packet.Data["y"];
+
+        // ここで`Move`の処理
+    }
+}
+```
