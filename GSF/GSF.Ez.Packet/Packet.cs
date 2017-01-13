@@ -16,13 +16,16 @@ namespace GSF.Ez.Packet
 
     public class WorldInfo : PacketBase
     {
-        public EzPlayer[] Players;
+        public EzPlayer Player;
+        public EzPlayer[] OtherPlayers;
 
         public Dictionary<string, object> Property;
     }
 
     public class ModifyPlayerProperty : PacketBase
     {
+        public EzPlayer Player;
+
         public Dictionary<string, object> Property;
     }
     public class ModifyWorldProperty : PacketBase
@@ -42,7 +45,7 @@ namespace GSF.Ez.Packet
 	{
 		public Dictionary<string, object> Property;
 	}
-
+     
     public class JoinPlayer : PacketBase
     {
         public EzPlayer Player;

@@ -6,6 +6,8 @@ using System.Net;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO.Compression;
 
 using GSF;
 using GSF.Packet;
@@ -14,6 +16,7 @@ using GSF.Ez.Packet;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 
 namespace GSF.Ez
 {
@@ -95,14 +98,19 @@ namespace GSF.Ez
 
 			lock (OptionalWorldProperty)
 			{
-				foreach (var key in packet.Keys)
-					dic[key] = OptionalWorldProperty[key];
+                foreach (var key in packet.Keys)
+                {
+                    if (OptionalWorldProperty.ContainsKey(key))
+                        dic[key] = OptionalWorldProperty[key];
+                    else
+                        dic[key] = null;
+                }
 			}
 
-			SendPacket(new OptionalWorldProperty()
-			{
-				Property = dic
-			});
+            SendReplyPacket(packet, new OptionalWorldProperty()
+            {
+                Property = dic
+            });
 		}
 
 		public void OnModifyOptionalWorldProperty(ModifyOptionalWorldProperty packet)
@@ -135,14 +143,25 @@ namespace GSF.Ez
         {
             foreach (var pair in packet.Property)
                 Player.Property[pair.Key] = pair.Value;
+
+            lock (Sessions)
+            {
+                packet.Player = Player;
+                Sessions.Broadcast(packet);
+            }
         }
 
         public void OnJoinPlayer(JoinPlayer packet)
         {
+            var inputPlayer = packet.Player;
+
 			if (File.Exists("players\\" + packet.Player.PlayerId))
 			{
 				var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
-				packet.Player =JsonConvert.DeserializeObject<EzPlayer>(json);
+				packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
+
+                foreach (var pair in inputPlayer.Property)
+                    packet.Player.Property[pair.Key] = pair.Value;
 			}
 
             lock (Sessions)
@@ -153,7 +172,8 @@ namespace GSF.Ez
                 {
                     SendPacket(new WorldInfo()
                     {
-                        Players = Sessions.Select(x => x.Player).ToArray(),
+                        Player = packet.Player,
+                        OtherPlayers = Sessions.Select(x => x.Player).ToArray(),
                         Property = WorldProperty
                     });
                 }
