@@ -17,6 +17,7 @@ using GSF.Ez.Packet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using JsonFx.Json;
 
 namespace GSF.Ez
 {
@@ -44,19 +45,18 @@ namespace GSF.Ez
 			}
 
 			var json = File.ReadAllText(ConfigPath);
-			config = JsonConvert.DeserializeObject<Config>(json);
+            config = JsonFx.Json.JsonReader.Deserialize<Config>(json);
 
 			Console.WriteLine("LoadConfig");
 			Console.WriteLine(json);
 		}
 
-		private static JObject LoadPropertyFromDataSource(string uri)
+		private static dynamic LoadPropertyFromDataSource(string uri)
 		{
 			var http = new HttpClient();
 			var json = http.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
 
-			var jobj = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-			return (JObject)jobj["worldProperty"];
+            return JsonFx.Json.JsonReader.Deserialize<Dictionary<string, object>>(json)["worldProperty"];
 		}
 
 		public static void Init()
