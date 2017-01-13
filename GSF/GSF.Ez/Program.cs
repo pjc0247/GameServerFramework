@@ -23,16 +23,24 @@ namespace GSF.Ez
 {
 	public class Config
 	{
+        public int Port;
+
 		public string OptionalWorldPropertyDataSource;
 		public string WorldPropertyDataSource;
 
 		public Dictionary<string, object> WorldProperty;
 		public Dictionary<string, object> OptionalWorldProperty;
+
+        // default values
+        public Config()
+        {
+            Port = 9916;
+        }
 	}
 
 	public class InitializationService
 	{
-		private static Config config;
+		public static Config Config;
 
 		private static readonly string ConfigPath = "config.json";
 
@@ -40,12 +48,12 @@ namespace GSF.Ez
 		{
 			if (File.Exists(ConfigPath) == false)
 			{
-				config = new Config();
+				Config = new Config();
 				return;
 			}
 
 			var json = File.ReadAllText(ConfigPath);
-            config = JsonFx.Json.JsonReader.Deserialize<Config>(json);
+            Config = JsonFx.Json.JsonReader.Deserialize<Config>(json);
 
 			Console.WriteLine("LoadConfig");
 			Console.WriteLine(json);
@@ -64,23 +72,23 @@ namespace GSF.Ez
 			LoadConfig();
 
 			// from DefaultValue
-			if (config.OptionalWorldProperty != null)
-				EzService.OptionalWorldProperty = config.OptionalWorldProperty;
-			if (config.WorldProperty != null)
-				EzService.WorldProperty = config.WorldProperty;
+			if (Config.OptionalWorldProperty != null)
+				EzService.OptionalWorldProperty = Config.OptionalWorldProperty;
+			if (Config.WorldProperty != null)
+				EzService.WorldProperty = Config.WorldProperty;
 
 			// from DataSource
-			if (string.IsNullOrEmpty(config.OptionalWorldPropertyDataSource) == false) {
+			if (string.IsNullOrEmpty(Config.OptionalWorldPropertyDataSource) == false) {
 				Console.WriteLine("Load OptionalWorldProperty from DataSource");
-                var data = LoadPropertyFromDataSource(config.OptionalWorldPropertyDataSource);
+                var data = LoadPropertyFromDataSource(Config.OptionalWorldPropertyDataSource);
                 foreach (var pair in data)
 					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
             }
-			if (string.IsNullOrEmpty(config.WorldPropertyDataSource) == false)
+			if (string.IsNullOrEmpty(Config.WorldPropertyDataSource) == false)
 			{
 				Console.WriteLine("Load WorldProperty from DataSource");
-                var data = LoadPropertyFromDataSource(config.WorldPropertyDataSource);
+                var data = LoadPropertyFromDataSource(Config.WorldPropertyDataSource);
                 foreach (var pair in data)
 					EzService.WorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
@@ -231,13 +239,14 @@ namespace GSF.Ez
             Console.WriteLine("Ez");
 
 			InitializationService.Init();
+            var config = InitializationService.Config;
 
-			if (Directory.Exists("players") == false)
+            if (Directory.Exists("players") == false)
 				Directory.CreateDirectory("players");
 
             PacketSerializer.Protocol = new JsonProtocol();
 
-            Server.Create(9916)
+            Server.Create(config.Port)
                 .WithService<EzService>("/echo")
                 //.WithService<GSF.Ranking.RankingService>("/echo")
                 .Run();
