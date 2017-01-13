@@ -247,8 +247,7 @@ namespace GSF.Ez
             PacketSerializer.Protocol = new JsonProtocol();
 
             Server.Create(config.Port)
-                .WithService<EzService>("/echo")
-                //.WithService<GSF.Ranking.RankingService>("/echo")
+                .WithService<EzService>("/ez")
                 .Run();
 
             Console.ReadLine();
