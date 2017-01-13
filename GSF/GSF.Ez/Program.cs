@@ -22,11 +22,11 @@ namespace GSF.Ez
 {
 	public class Config
 	{
-		public string OptionalPropertyDataSource;
+		public string OptionalWorldPropertyDataSource;
 		public string WorldPropertyDataSource;
 
 		public Dictionary<string, object> WorldProperty;
-		public Dictionary<string, object> OptionalProperty;
+		public Dictionary<string, object> OptionalWorldProperty;
 	}
 
 	public class InitializationService
@@ -64,22 +64,26 @@ namespace GSF.Ez
 			LoadConfig();
 
 			// from DefaultValue
-			if (config.OptionalProperty != null)
-				EzService.OptionalWorldProperty = config.OptionalProperty;
+			if (config.OptionalWorldProperty != null)
+				EzService.OptionalWorldProperty = config.OptionalWorldProperty;
 			if (config.WorldProperty != null)
 				EzService.WorldProperty = config.WorldProperty;
 
 			// from DataSource
-			if (string.IsNullOrEmpty(config.OptionalPropertyDataSource) == false) {
+			if (string.IsNullOrEmpty(config.OptionalWorldPropertyDataSource) == false) {
 				Console.WriteLine("Load OptionalWorldProperty from DataSource");
-				foreach (var pair in LoadPropertyFromDataSource(config.OptionalPropertyDataSource))
+                var data = LoadPropertyFromDataSource(config.OptionalWorldPropertyDataSource);
+                foreach (var pair in data)
 					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
-			}
+                Console.WriteLine("Done (" + data.Count + " Key(s))");
+            }
 			if (string.IsNullOrEmpty(config.WorldPropertyDataSource) == false)
 			{
 				Console.WriteLine("Load WorldProperty from DataSource");
-				foreach (var pair in LoadPropertyFromDataSource(config.WorldPropertyDataSource))
+                var data = LoadPropertyFromDataSource(config.WorldPropertyDataSource);
+                foreach (var pair in data)
 					EzService.WorldProperty[pair.Key] = pair.Value;
+                Console.WriteLine("Done (" + data.Count + " Key(s))");
 			}
 		}
 	}
