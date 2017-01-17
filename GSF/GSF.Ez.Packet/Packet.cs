@@ -27,10 +27,12 @@ namespace GSF.Ez.Packet
         public EzPlayer Player;
 
         public Dictionary<string, object> Property;
+        public string[] RemovedKeys;
     }
     public class ModifyWorldProperty : PacketBase
     {
         public Dictionary<string, object> Property;
+        public string[] RemovedKeys;
     }
 
 	public class RequestOptionalWorldProperty : PacketBase
@@ -44,7 +46,8 @@ namespace GSF.Ez.Packet
 	public class ModifyOptionalWorldProperty : PacketBase
 	{
 		public Dictionary<string, object> Property;
-	}
+        public string[] RemovedKeys;
+    }
      
     public class JoinPlayer : PacketBase
     {

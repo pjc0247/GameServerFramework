@@ -137,6 +137,9 @@ namespace GSF.Ez
 			{
 				foreach (var pair in packet.Property)
 					OptionalWorldProperty[pair.Key] = pair.Value;
+
+                foreach (var key in packet.RemovedKeys)
+                    OptionalWorldProperty.Remove(key);
 			}
 
 			lock (Sessions)
@@ -150,6 +153,9 @@ namespace GSF.Ez
             {
                 foreach (var pair in packet.Property)
                     WorldProperty[pair.Key] = pair.Value;
+
+                foreach (var key in packet.RemovedKeys)
+                    WorldProperty.Remove(key);
             }
 
 			lock (Sessions)
@@ -161,6 +167,9 @@ namespace GSF.Ez
         {
             foreach (var pair in packet.Property)
                 Player.Property[pair.Key] = pair.Value;
+
+            foreach (var key in packet.RemovedKeys)
+                Player.Property.Remove(key);
 
             lock (Sessions)
             {
