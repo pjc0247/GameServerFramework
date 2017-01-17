@@ -66,6 +66,11 @@ namespace GSF.Ez
 
             return JsonFx.Json.JsonReader.Deserialize<Dictionary<string, object>>(json)["worldProperty"];
 		}
+        private static string BindString(string src)
+        {
+            src = src.Replace("{rd}", (new Random()).Next(10000).ToString());
+            return src;
+        }
 
 		public static void Init()
 		{
@@ -80,7 +85,8 @@ namespace GSF.Ez
 			// from DataSource
 			if (string.IsNullOrEmpty(Config.OptionalWorldPropertyDataSource) == false) {
 				Console.WriteLine("Load OptionalWorldProperty from DataSource");
-                var data = LoadPropertyFromDataSource(Config.OptionalWorldPropertyDataSource);
+
+                var data = LoadPropertyFromDataSource(BindString(Config.OptionalWorldPropertyDataSource));
                 foreach (var pair in data)
 					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
@@ -88,7 +94,7 @@ namespace GSF.Ez
 			if (string.IsNullOrEmpty(Config.WorldPropertyDataSource) == false)
 			{
 				Console.WriteLine("Load WorldProperty from DataSource");
-                var data = LoadPropertyFromDataSource(Config.WorldPropertyDataSource);
+                var data = LoadPropertyFromDataSource(BindString(Config.WorldPropertyDataSource));
                 foreach (var pair in data)
 					EzService.WorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
