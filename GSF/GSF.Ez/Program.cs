@@ -37,6 +37,11 @@ namespace GSF.Ez
             Port = 9916;
         }
 	}
+    public class World
+    {
+        public Dictionary<string, object> WorldProperty;
+        public Dictionary<string, object> OptionalWorldProperty;
+    }
 
 	public class InitializationService
 	{
@@ -109,6 +114,20 @@ namespace GSF.Ez
 		public static Dictionary<string, object> OptionalWorldProperty = new Dictionary<string, object>();
 
         private EzPlayer Player;
+
+        public static World GetWorldSnapshot()
+        {
+            var world = new World();
+
+            lock (OptionalWorldProperty)
+            lock (WorldProperty)
+            {
+                world.WorldProperty = new Dictionary<string, object>();
+                world.OptionalWorldProperty = new Dictionary<string, object>(OptionalWorldProperty);
+            }
+
+            return world;
+        }
 
 		public void OnRequestOptionalWorldProperty(RequestOptionalWorldProperty packet)
 		{
@@ -221,7 +240,7 @@ namespace GSF.Ez
         }
         public void OnLeavePlayer(LeavePlayer packet)
         {
-            if (Player == null) return;
+            if (Player == null) return; 
 
             lock (Sessions)
             {
