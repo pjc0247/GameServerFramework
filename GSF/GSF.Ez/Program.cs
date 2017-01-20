@@ -79,7 +79,12 @@ namespace GSF.Ez
 
 		public static void Init()
 		{
-			LoadConfig();
+            LoadConfig();
+            if (LoadWorld())
+            {
+                Console.WriteLine("LoadFromSavedata");
+                return;
+            }
 
 			// from DefaultValue
 			if (Config.OptionalWorldProperty != null)
@@ -105,6 +110,38 @@ namespace GSF.Ez
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
 			}
 		}
+
+        public static bool LoadWorld()
+        {
+            if (File.Exists("savedata.dat") == false)
+                return false;
+
+            var json = File.ReadAllText("savedata.dat");
+            JsonSerializerSettings setting = new JsonSerializerSettings()
+            {
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+                TypeNameHandling = TypeNameHandling.All
+            };
+            var world = JsonConvert.DeserializeObject<World>(json, setting);
+
+            EzService.WorldProperty = world.WorldProperty;
+            EzService.OptionalWorldProperty = world.OptionalWorldProperty;
+
+            return true;
+        }
+        public static void SaveWorld()
+        {
+            var world = EzService.GetWorldSnapshot();
+
+            JsonSerializerSettings setting = new JsonSerializerSettings()
+            {
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Full,
+                TypeNameHandling = TypeNameHandling.All
+            };
+            var json = JsonConvert.SerializeObject(world, setting);
+
+            File.WriteAllText("savedata.dat", json);
+        }
 	}
 
     public class EzService : Service<EzService>
@@ -122,7 +159,7 @@ namespace GSF.Ez
             lock (OptionalWorldProperty)
             lock (WorldProperty)
             {
-                world.WorldProperty = new Dictionary<string, object>();
+                world.WorldProperty = new Dictionary<string, object>();   
                 world.OptionalWorldProperty = new Dictionary<string, object>(OptionalWorldProperty);
             }
 
@@ -293,7 +330,17 @@ namespace GSF.Ez
                 .WithService<EzService>("/ez")
                 .Run();
 
-            Console.ReadLine();
+            while (true)
+            {
+                var cmd = Console.ReadLine();
+
+                if (cmd == "save")
+                {
+                    Console.Write("Save.....");
+                    InitializationService.SaveWorld();
+                    Console.WriteLine(" [done]");
+                }
+            }
         }
     }
 }
