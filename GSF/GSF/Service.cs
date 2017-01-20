@@ -164,9 +164,11 @@ namespace GSF
         {
             ErrorClose(CloseStatusCode.ServerError, "healthcheck failure");
         }
+        protected virtual void OnSessionOpened()
+        {
+        }
         protected virtual void OnSessionClosed()
         {
-
         }
 
         protected override async void OnOpen()
@@ -198,6 +200,8 @@ namespace GSF
 
             await ProcessLogin(userType, userId, accessToken);
             #endregion
+
+            OnSessionOpened();
 
             if (HasICheckable)
                 HealthChecker.Add((ICheckable)this);

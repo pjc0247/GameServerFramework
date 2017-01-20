@@ -166,7 +166,15 @@ namespace GSF.Ez
             return world;
         }
 
-		public void OnRequestOptionalWorldProperty(RequestOptionalWorldProperty packet)
+        protected override void OnSessionOpened()
+        {
+        }
+        protected override void OnSessionClosed()
+        {
+            OnLeavePlayer(null);
+        }
+
+        public void OnRequestOptionalWorldProperty(RequestOptionalWorldProperty packet)
 		{
 			var dic = new Dictionary<string, object>();
 
@@ -271,6 +279,8 @@ namespace GSF.Ez
                 }
 
                 Sessions.Add(this);
+
+                Console.Title = $"GSF.Ez,  {Sessions.Count} user(s) online";
             }
 
             Player = packet.Player;
@@ -286,15 +296,13 @@ namespace GSF.Ez
                 {
                     Player = Player
                 });
+
+                Console.Title = $"GSF.Ez,  {Sessions.Count} user(s) online";
             }
 
 			var json = JsonConvert.SerializeObject(Player);
 			File.WriteAllText("players\\" + Player.PlayerId, json);
             Player = null;
-        }
-        protected override void OnSessionClosed()
-        {
-            OnLeavePlayer(null);
         }
 
         public void OnRequestBroadcast(RequestBroadcast packet)
@@ -317,6 +325,7 @@ namespace GSF.Ez
         public static void Main(string[] args)
         {
             Console.WriteLine("Ez");
+            Console.Title = "GSF.Ez";
 
 			InitializationService.Init();
             var config = InitializationService.Config;
