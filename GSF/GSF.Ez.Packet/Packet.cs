@@ -16,6 +16,8 @@ namespace GSF.Ez.Packet
 
     public class WorldInfo : PacketBase
     {
+        public string RootPlayerId;
+
         public EzPlayer Player;
         public EzPlayer[] OtherPlayers;
 
@@ -56,6 +58,8 @@ namespace GSF.Ez.Packet
     public class LeavePlayer : PacketBase
     {
         public EzPlayer Player;
+
+        public string RootPlayerId;
     }
 
     public class BroadcastPacket : PacketBase

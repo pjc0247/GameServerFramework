@@ -266,12 +266,21 @@ namespace GSF.Ez
 
             lock (Sessions)
             {
-                Sessions.Broadcast(packet);
+                EzPlayer rootPlayer = null;
+
+                if (Sessions.Count > 0) {
+                    Sessions.Broadcast(packet);
+                    rootPlayer = Sessions.First().Player;
+                }
+                else
+                    rootPlayer = packet.Player;
 
                 lock (WorldProperty)
                 {
                     SendPacket(new WorldInfo()
                     {
+                        RootPlayerId = rootPlayer.PlayerId,
+
                         Player = packet.Player,
                         OtherPlayers = Sessions.Select(x => x.Player).ToArray(),
                         Property = WorldProperty
@@ -292,10 +301,16 @@ namespace GSF.Ez
             lock (Sessions)
             {
                 Sessions.Remove(this);
-                Sessions.Broadcast(new LeavePlayer()
+
+                if (Sessions.Count > 0)
                 {
-                    Player = Player
-                });
+                    Sessions.Broadcast(new LeavePlayer()
+                    {
+                        RootPlayerId = Sessions.First().Player.PlayerId,
+
+                        Player = Player
+                    });
+                }
 
                 Console.Title = $"GSF.Ez,  {Sessions.Count} user(s) online";
             }
