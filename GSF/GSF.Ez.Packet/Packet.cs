@@ -7,11 +7,19 @@ namespace GSF.Ez.Packet
 {
     using GSF.Packet;
 
+    public class EzItem
+    {
+        public string ItemId;
+        public long Quantity;
+
+        public Dictionary<string, object> Property;
+    }
     public class EzPlayer
     {
         public string PlayerId;
 
         public Dictionary<string, object> Property;
+        public Dictionary<string, EzItem> PublicInventory;
     }
 
     public class WorldInfo : PacketBase
@@ -22,6 +30,7 @@ namespace GSF.Ez.Packet
         public EzPlayer[] OtherPlayers;
 
         public Dictionary<string, object> Property;
+        public EzItem[] PrivateInventory;
     }
 
     public class ModifyPlayerProperty : PacketBase
@@ -87,4 +96,36 @@ namespace GSF.Ez.Packet
     {
         public string[] Tags;
     }
+
+    #region INVENTORY_PACKET
+    public enum EzItemMergeType
+    {
+        Never,
+        Allow
+    }
+
+    public class AddItemToPrivateInventory : PacketBase
+    {
+        public EzItem[] Item;
+
+        public EzItemMergeType MergeType;
+    }
+    public class RemoveItemFromPrivateInventory : PacketBase
+    {
+        public EzItem[] Item;
+    }
+    public class ConsumeItemFromPrivateInventory : PacketBase
+    {
+        public EzItem[] Item;
+    }
+    public class MoveToPublicInventory : PacketBase
+    {
+        public EzItem Item;
+        public string Key;
+    }
+    public class MoveToPrivateInventory : PacketBase
+    {
+        public string Key;
+    }
+    #endregion
 }

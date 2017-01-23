@@ -144,7 +144,7 @@ namespace GSF.Ez
         }
 	}
 
-    public class EzService : Service<EzService>
+    public partial class EzService : Service<EzService>
     {
         private static List<EzService> Sessions = new List<EzService>();
         public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
