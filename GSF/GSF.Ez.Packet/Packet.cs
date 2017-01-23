@@ -30,11 +30,15 @@ namespace GSF.Ez.Packet
 
         public Dictionary<string, object> Property;
         public string[] RemovedKeys;
+
+        public bool Slient;
     }
     public class ModifyWorldProperty : PacketBase
     {
         public Dictionary<string, object> Property;
         public string[] RemovedKeys;
+
+        public bool Slient;
     }
 
 	public class RequestOptionalWorldProperty : PacketBase
@@ -49,6 +53,8 @@ namespace GSF.Ez.Packet
 	{
 		public Dictionary<string, object> Property;
         public string[] RemovedKeys;
+
+        public bool Slient;
     }
      
     public class JoinPlayer : PacketBase

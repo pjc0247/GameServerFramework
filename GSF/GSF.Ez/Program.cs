@@ -210,7 +210,10 @@ namespace GSF.Ez
                 }
 			}
 
-			lock (Sessions)
+            if (packet.Slient)
+                return;
+
+            lock (Sessions)
 			{
 				Sessions.Broadcast(packet);
 			}
@@ -229,6 +232,9 @@ namespace GSF.Ez
                 }
             }
 
+            if (packet.Slient)
+                return;
+
 			lock (Sessions)
 			{
 				Sessions.Broadcast(packet);
@@ -244,6 +250,9 @@ namespace GSF.Ez
                 foreach (var key in packet.RemovedKeys)
                     Player.Property.Remove(key);
             }
+
+            if (packet.Slient)
+                return;
 
             lock (Sessions)
             {
