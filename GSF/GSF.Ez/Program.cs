@@ -149,6 +149,7 @@ namespace GSF.Ez
         private static List<EzService> Sessions = new List<EzService>();
         public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
 		public static Dictionary<string, object> OptionalWorldProperty = new Dictionary<string, object>();
+        public static Dictionary<string, List<EzService>> Subscriptions = new Dictionary<string, List<EzService>>();
 
         private EzPlayer Player;
 
@@ -322,15 +323,52 @@ namespace GSF.Ez
 
         public void OnRequestBroadcast(RequestBroadcast packet)
         {
+            IEnumerable<EzService> receivers = null;
+
+            lock (Subscriptions)
             lock (Sessions)
             {
-                Sessions.Broadcast(new BroadcastPacket()
+                if (packet.Tag == null)
+                    receivers = Sessions;
+                else if (Subscriptions.ContainsKey(packet.Tag))
+                    receivers = Subscriptions[packet.Tag];
+                else
+                    return;
+
+                receivers.Broadcast(new BroadcastPacket()
                 {
                     Sender = Player,
 
                     Type = packet.Type,
                     Data = packet.Data                    
                 });
+            }
+        }
+
+        public void OnSubscribeTag(SubscribeTag packet)
+        {
+            lock (Subscriptions)
+            {
+                foreach (var tag in packet.Tags)
+                {
+                    if (Subscriptions.ContainsKey(tag) == false)
+                        Subscriptions[tag] = new List<EzService>();
+
+                    Subscriptions[tag].Add(this);
+                }
+            }
+        }
+        public void OnUnsubscribeTag(UnsubscribeTag packet)
+        {
+            lock (Subscriptions)
+            {
+                foreach (var tag in packet.Tags)
+                {
+                    if (Subscriptions.ContainsKey(tag) == false)
+                        continue;
+
+                    Subscriptions[tag].Remove(this);
+                }
             }
         }
     }

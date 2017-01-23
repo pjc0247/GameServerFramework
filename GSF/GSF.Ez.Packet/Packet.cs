@@ -68,10 +68,23 @@ namespace GSF.Ez.Packet
 
         public int Type;
         public Dictionary<string, object> Data;
+
+        public string Tag;
     }
     public class RequestBroadcast : PacketBase
     {
         public int Type;
         public Dictionary<string, object> Data;
+
+        public string Tag;
+    }
+
+    public class SubscribeTag : PacketBase
+    {
+        public string[] Tags;
+    }
+    public class UnsubscribeTag : PacketBase
+    {
+        public string[] Tags;
     }
 }
