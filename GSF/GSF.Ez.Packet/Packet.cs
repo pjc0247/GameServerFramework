@@ -106,17 +106,17 @@ namespace GSF.Ez.Packet
 
     public class AddItemToPrivateInventory : PacketBase
     {
-        public EzItem[] Item;
+        public EzItem[] Items;
 
         public EzItemMergeType MergeType;
     }
     public class RemoveItemFromPrivateInventory : PacketBase
     {
-        public EzItem[] Item;
+        public EzItem[] Items;
     }
     public class ConsumeItemFromPrivateInventory : PacketBase
     {
-        public EzItem[] Item;
+        public EzItem[] Items;
     }
     public class MoveToPublicInventory : PacketBase
     {

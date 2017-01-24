@@ -10,6 +10,20 @@ namespace GSF.Ez
 
     public partial class EzService
     {
-        public void 
+        public void OnAddItemToPrivateInventory(AddItemToPrivateInventory packet)
+        {
+            foreach(var item in packet.Items)
+            {
+
+            }
+        }
+        public void OnRemoveItemFromPrivateInventory(RemoveItemFromPrivateInventory packet)
+        {
+
+        }
+        public void OnConsumeItemFromPrivateInventory(ConsumeItemFromPrivateInventory packet)
+        {
+
+        }
     }
 }

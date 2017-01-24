@@ -152,6 +152,7 @@ namespace GSF.Ez
         public static Dictionary<string, List<EzService>> Subscriptions = new Dictionary<string, List<EzService>>();
 
         private EzPlayer Player;
+        private List<EzItem> PrivateInventory = new List<EzItem>();
 
         public static World GetWorldSnapshot()
         {
