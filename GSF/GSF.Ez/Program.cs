@@ -380,6 +380,33 @@ namespace GSF.Ez
                 }
             }
         }
+
+        public void OnRequestRemoteCall(RequestRemoteCall packet)
+        {
+            EzService target;
+
+            lock (Sessions)
+            {
+                target = Sessions.FirstOrDefault(x => x.Player.PlayerId == packet.Player.PlayerId);
+                if (target == null)
+                    return;
+            }
+
+            target.SendPacket(packet);
+        }
+        public void OnResponseRemoteCall(RespondRemoteCall packet)
+        {
+            EzService target;
+
+            lock (Sessions)
+            {
+                target = Sessions.FirstOrDefault(x => x.Player.PlayerId == packet.RespondTo.PlayerId);
+                if (target == null)
+                    return;
+            }
+
+            target.SendPacket(packet);
+        }
     }
 
     public class Program

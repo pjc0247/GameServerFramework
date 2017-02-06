@@ -93,4 +93,21 @@ namespace GSF.Ez.Packet
     {
         public string[] Tags;
     }
+
+    public class RequestRemoteCall : PacketBase
+    {
+        public EzPlayer Player;
+
+        public string FunctionName;
+        public object[] Args;
+    }
+    public class RespondRemoteCall : PacketBase
+    {
+        public EzPlayer RespondTo;
+
+        public object Result;
+        public Exception Exception;
+
+        public bool IsSuccess;
+    }
 }
