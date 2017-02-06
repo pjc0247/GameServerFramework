@@ -392,6 +392,7 @@ namespace GSF.Ez
                     return;
             }
 
+            packet.Player = Player;
             target.SendPacket(packet);
         }
         public void OnResponseRemoteCall(RespondRemoteCall packet)
