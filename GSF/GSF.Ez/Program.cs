@@ -21,64 +21,64 @@ using JsonFx.Json;
 
 namespace GSF.Ez
 {
-	public class Config
-	{
+    public class Config
+    {
         public int Port;
 
-		public string OptionalWorldPropertyDataSource;
-		public string WorldPropertyDataSource;
+        public string OptionalWorldPropertyDataSource;
+        public string WorldPropertyDataSource;
 
-		public Dictionary<string, object> WorldProperty;
-		public Dictionary<string, object> OptionalWorldProperty;
+        public Dictionary<string, object> WorldProperty;
+        public Dictionary<string, object> OptionalWorldProperty;
 
         // default values
         public Config()
         {
             Port = 9916;
         }
-	}
+    }
     public class World
     {
         public Dictionary<string, object> WorldProperty;
         public Dictionary<string, object> OptionalWorldProperty;
     }
 
-	public class InitializationService
-	{
-		public static Config Config;
+    public class InitializationService
+    {
+        public static Config Config;
 
-		private static readonly string ConfigPath = "config.json";
+        private static readonly string ConfigPath = "config.json";
 
-		private static void LoadConfig()
-		{
-			if (File.Exists(ConfigPath) == false)
-			{
-				Config = new Config();
-				return;
-			}
+        private static void LoadConfig()
+        {
+            if (File.Exists(ConfigPath) == false)
+            {
+                Config = new Config();
+                return;
+            }
 
-			var json = File.ReadAllText(ConfigPath);
+            var json = File.ReadAllText(ConfigPath);
             Config = JsonFx.Json.JsonReader.Deserialize<Config>(json);
 
-			Console.WriteLine("LoadConfig");
-			Console.WriteLine(json);
-		}
+            Console.WriteLine("LoadConfig");
+            Console.WriteLine(json);
+        }
 
-		private static dynamic LoadPropertyFromDataSource(string uri)
-		{
-			var http = new HttpClient();
-			var json = http.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
+        private static dynamic LoadPropertyFromDataSource(string uri)
+        {
+            var http = new HttpClient();
+            var json = http.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
 
             return JsonFx.Json.JsonReader.Deserialize<Dictionary<string, object>>(json)["worldProperty"];
-		}
+        }
         private static string BindString(string src)
         {
             src = src.Replace("{rd}", (new Random()).Next(10000).ToString());
             return src;
         }
 
-		public static void Init()
-		{
+        public static void Init()
+        {
             LoadConfig();
             if (LoadWorld())
             {
@@ -86,30 +86,30 @@ namespace GSF.Ez
                 return;
             }
 
-			// from DefaultValue
-			if (Config.OptionalWorldProperty != null)
-				EzService.OptionalWorldProperty = Config.OptionalWorldProperty;
-			if (Config.WorldProperty != null)
-				EzService.WorldProperty = Config.WorldProperty;
+            // from DefaultValue
+            if (Config.OptionalWorldProperty != null)
+                EzService.OptionalWorldProperty = Config.OptionalWorldProperty;
+            if (Config.WorldProperty != null)
+                EzService.WorldProperty = Config.WorldProperty;
 
-			// from DataSource
-			if (string.IsNullOrEmpty(Config.OptionalWorldPropertyDataSource) == false) {
-				Console.WriteLine("Load OptionalWorldProperty from DataSource");
+            // from DataSource
+            if (string.IsNullOrEmpty(Config.OptionalWorldPropertyDataSource) == false) {
+                Console.WriteLine("Load OptionalWorldProperty from DataSource");
 
                 var data = LoadPropertyFromDataSource(BindString(Config.OptionalWorldPropertyDataSource));
                 foreach (var pair in data)
-					EzService.OptionalWorldProperty[pair.Key] = pair.Value;
+                    EzService.OptionalWorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
             }
-			if (string.IsNullOrEmpty(Config.WorldPropertyDataSource) == false)
-			{
-				Console.WriteLine("Load WorldProperty from DataSource");
+            if (string.IsNullOrEmpty(Config.WorldPropertyDataSource) == false)
+            {
+                Console.WriteLine("Load WorldProperty from DataSource");
                 var data = LoadPropertyFromDataSource(BindString(Config.WorldPropertyDataSource));
                 foreach (var pair in data)
-					EzService.WorldProperty[pair.Key] = pair.Value;
+                    EzService.WorldProperty[pair.Key] = pair.Value;
                 Console.WriteLine("Done (" + data.Count + " Key(s))");
-			}
-		}
+            }
+        }
 
         public static bool LoadWorld()
         {
@@ -142,13 +142,13 @@ namespace GSF.Ez
 
             File.WriteAllText("savedata.dat", json);
         }
-	}
+    }
 
     public class EzService : Service<EzService>
     {
         private static List<EzService> Sessions = new List<EzService>();
         public static Dictionary<string, object> WorldProperty = new Dictionary<string, object>();
-		public static Dictionary<string, object> OptionalWorldProperty = new Dictionary<string, object>();
+        public static Dictionary<string, object> OptionalWorldProperty = new Dictionary<string, object>();
         public static Dictionary<string, List<EzService>> Subscriptions = new Dictionary<string, List<EzService>>();
 
         private EzPlayer Player;
@@ -176,11 +176,11 @@ namespace GSF.Ez
         }
 
         public void OnRequestOptionalWorldProperty(RequestOptionalWorldProperty packet)
-		{
-			var dic = new Dictionary<string, object>();
+        {
+            var dic = new Dictionary<string, object>();
 
-			lock (OptionalWorldProperty)
-			{
+            lock (OptionalWorldProperty)
+            {
                 foreach (var key in packet.Keys)
                 {
                     if (OptionalWorldProperty.ContainsKey(key))
@@ -188,36 +188,36 @@ namespace GSF.Ez
                     else
                         dic[key] = null;
                 }
-			}
+            }
 
             SendReplyPacket(packet, new OptionalWorldProperty()
             {
                 Property = dic
             });
-		}
+        }
 
-		public void OnModifyOptionalWorldProperty(ModifyOptionalWorldProperty packet)
-		{
-			lock (OptionalWorldProperty)
-			{
-				foreach (var pair in packet.Property)
-					OptionalWorldProperty[pair.Key] = pair.Value;
+        public void OnModifyOptionalWorldProperty(ModifyOptionalWorldProperty packet)
+        {
+            lock (OptionalWorldProperty)
+            {
+                foreach (var pair in packet.Property)
+                    OptionalWorldProperty[pair.Key] = pair.Value;
 
                 if (packet.RemovedKeys != null)
                 {
                     foreach (var key in packet.RemovedKeys)
                         OptionalWorldProperty.Remove(key);
                 }
-			}
+            }
 
             if (packet.Slient)
                 return;
 
             lock (Sessions)
-			{
-				Sessions.Broadcast(packet);
-			}
-		}
+            {
+                Sessions.Broadcast(packet);
+            }
+        }
         public void OnModifyWorldProperty(ModifyWorldProperty packet)
         {
             lock (WorldProperty)
@@ -235,10 +235,10 @@ namespace GSF.Ez
             if (packet.Slient)
                 return;
 
-			lock (Sessions)
-			{
-				Sessions.Broadcast(packet);
-			}
+            lock (Sessions)
+            {
+                Sessions.Broadcast(packet);
+            }
         }
         public void OnModifyPlayerProperty(ModifyPlayerProperty packet)
         {
@@ -265,14 +265,14 @@ namespace GSF.Ez
         {
             var inputPlayer = packet.Player;
 
-			if (File.Exists("players\\" + packet.Player.PlayerId))
-			{
-				var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
-				packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
+            if (File.Exists("players\\" + packet.Player.PlayerId))
+            {
+                var json = File.ReadAllText("players\\" + packet.Player.PlayerId);
+                packet.Player = JsonConvert.DeserializeObject<EzPlayer>(json);
 
                 foreach (var pair in inputPlayer.Property)
                     packet.Player.Property[pair.Key] = pair.Value;
-			}
+            }
 
             lock (Sessions)
             {
@@ -325,8 +325,8 @@ namespace GSF.Ez
                 Console.Title = $"GSF.Ez,  {Sessions.Count} user(s) online";
             }
 
-			var json = JsonConvert.SerializeObject(Player);
-			File.WriteAllText("players\\" + Player.PlayerId, json);
+            var json = JsonConvert.SerializeObject(Player);
+            File.WriteAllText("players\\" + Player.PlayerId, json);
             Player = null;
         }
 
@@ -417,11 +417,11 @@ namespace GSF.Ez
             Console.WriteLine("Ez");
             Console.Title = "GSF.Ez";
 
-			InitializationService.Init();
+            InitializationService.Init();
             var config = InitializationService.Config;
 
             if (Directory.Exists("players") == false)
-				Directory.CreateDirectory("players");
+                Directory.CreateDirectory("players");
 
             PacketSerializer.Protocol = new JsonProtocol();
 
